@@ -1,7 +1,4 @@
 # This is a generated file; do not edit or check into version control.
-connectivity=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-2.0.2/
-connectivity_for_web=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_for_web-0.3.1+4/
-connectivity_macos=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_macos-0.1.0+7/
 path_provider_linux=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-0.0.1+2/
 path_provider_windows=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-0.0.4+3/
 shared_preferences=/Users/macbookair/dev/sdk/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.5.12+4/
