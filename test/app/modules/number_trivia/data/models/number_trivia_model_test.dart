@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../../fixtures/fixture_reader.dart';
 
 void main() {
-  final testNumberTriviaModel = NumberTriviaModel(number: 1, text: 'Test Text');
+  final tNumberTriviaModel = NumberTriviaModel(number: 1, text: 'Test Text');
   test('should be a subclass of NumberTrivia entity', () {
     // assert
-    expect(testNumberTriviaModel, isA<NumberTrivia>());
+    expect(tNumberTriviaModel, isA<NumberTrivia>());
   });
 
   group('fromJson', () {
@@ -20,7 +20,7 @@ void main() {
       // act
       final result = NumberTriviaModel.fromJson(jsonMap);
       // assert
-      expect(result, testNumberTriviaModel);
+      expect(result, tNumberTriviaModel);
     });
     test('should return a valid model when json number is regarded as double',
         () {
@@ -30,14 +30,14 @@ void main() {
       // act
       final result = NumberTriviaModel.fromJson(jsonMap);
       // assert
-      expect(result, testNumberTriviaModel);
+      expect(result, tNumberTriviaModel);
     });
   });
 
   group('toJson', () {
     test('should return a json map containing the proper data', () {
       // act
-      final result = testNumberTriviaModel.toJson();
+      final result = tNumberTriviaModel.toJson();
       // assert
       final expectedMap = {
         "text": "Test Text",

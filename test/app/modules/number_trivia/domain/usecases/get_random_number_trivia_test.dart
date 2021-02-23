@@ -18,16 +18,16 @@ void main() {
     usecase = GetRandomNumberTrivia(mockNumberTriviaRepository);
   });
 
-  final testNumberTrivia = NumberTrivia(number: 1, text: 'test');
+  final tNumberTrivia = NumberTrivia(number: 1, text: 'test');
 
   test('should return trivia from repository', () async {
     // arrange
     when(mockNumberTriviaRepository.getRandomNumberTrivia())
-        .thenAnswer((_) async => Right(testNumberTrivia));
+        .thenAnswer((_) async => Right(tNumberTrivia));
     // act
     final result = await usecase(NoParams());
     // expect
-    expect(result, Right(testNumberTrivia));
+    expect(result, Right(tNumberTrivia));
     verify(mockNumberTriviaRepository.getRandomNumberTrivia());
     verifyNoMoreInteractions(mockNumberTriviaRepository);
   });
