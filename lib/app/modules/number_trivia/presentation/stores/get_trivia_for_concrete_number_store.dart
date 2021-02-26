@@ -1,7 +1,4 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:flutter_tdd/app/core/error/failures.dart';
-import 'package:flutter_tdd/app/modules/number_trivia/domain/entities/number_trivia.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/util/input_converter.dart';
@@ -32,7 +29,6 @@ abstract class _GetTriviaForConcreteNumberStoreBase extends NumberTriviaStore
   }
 
   call(String numberString) {
-    Either<Failure, NumberTrivia> trivia;
     final inputEither = inputConverter.stringToUnsignedInt(numberString);
     return inputEither.fold(
       (failure) => Error(errorMessage: INVALID_INPUT_FAILURE_MESSAGE),
@@ -41,15 +37,8 @@ abstract class _GetTriviaForConcreteNumberStoreBase extends NumberTriviaStore
         final result = await getConcreteNumberTrivia(
           Params(number: integer),
         );
-        return result.fold(
-          (failure) {
-            Error(errorMessage: mapFailureToMessage(failure));
-          },
-          (trivia) {
-            state = StoreState.loaded;
-            this.numberTrivia = trivia;
-          },
-        );
+        if (result != null) this.eitherLoadedOrErrorState(result);
+        return null;
       },
     );
   }

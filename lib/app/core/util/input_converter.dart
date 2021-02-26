@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../error/failures.dart';
 
 class InputConverter {

@@ -1,10 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_tdd/app/core/error/failures.dart';
+import 'package:flutter_tdd/app/core/usecases/usecase.dart';
 import 'package:flutter_tdd/app/core/util/input_converter.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/domain/entities/number_trivia.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/domain/usecases/get_concrete_number_trivia.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/domain/usecases/get_random_number_trivia.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/presentation/stores/get_trivia_for_concrete_number_store.dart';
+import 'package:flutter_tdd/app/modules/number_trivia/presentation/stores/get_trivia_for_random_number_store.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/presentation/stores/number_trivia_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -17,8 +19,8 @@ class MockGetRandomNumberTrivia extends Mock implements GetRandomNumberTrivia {}
 class MockInputConverter extends Mock implements InputConverter {}
 
 void main() {
-  NumberTriviaStore store;
   GetTriviaForConcreteNumberStore getTriviaForConcreteNumberStore;
+  GetTriviaForRandomNumberStore getTriviaForRandomNumberStore;
   MockGetConcreteNumberTrivia mockGetConcreteNumberTrivia;
   MockGetRandomNumberTrivia mockGetRandomNumberTrivia;
   MockInputConverter mockInputConverter;
@@ -27,23 +29,12 @@ void main() {
     mockInputConverter = MockInputConverter();
     mockGetRandomNumberTrivia = MockGetRandomNumberTrivia();
     mockGetConcreteNumberTrivia = MockGetConcreteNumberTrivia();
-    store = NumberTriviaStore(
-      concrete: mockGetConcreteNumberTrivia,
-      random: mockGetRandomNumberTrivia,
-      inputConverter: mockInputConverter,
-    );
     getTriviaForConcreteNumberStore = GetTriviaForConcreteNumberStore(
       mockGetConcreteNumberTrivia,
       mockInputConverter,
     );
-  });
-
-  test('should return [state.initial]', () async {
-    // assert
-    expect(
-      getTriviaForConcreteNumberStore.state,
-      equals(StoreState.initial),
-    );
+    getTriviaForRandomNumberStore =
+        GetTriviaForRandomNumberStore(mockGetRandomNumberTrivia);
   });
 
   group('GetTriviaForConcreteNumber', () {
@@ -56,10 +47,13 @@ void main() {
         when(mockInputConverter.stringToUnsignedInt(any))
             .thenReturn(Right(tNumberParsed));
 
-    void getTriviaAndWaitInputConvertCall() async {
-      getTriviaForConcreteNumberStore(tNumberString);
-      await untilCalled(mockInputConverter.stringToUnsignedInt(tNumberString));
-    }
+    test('should return [state.initial]', () async {
+      // assert
+      expect(
+        getTriviaForConcreteNumberStore.state,
+        equals(StoreState.initial),
+      );
+    });
 
     test(
         'should call InputConverter to validate and convert the String to an unsigned Int',
@@ -67,7 +61,8 @@ void main() {
       // arrange
       setUpMockInputConverterSuccess();
       // act
-      getTriviaAndWaitInputConvertCall(); // await for that call. otherwise, should call verify (method after that, this should return null)
+      await getTriviaForConcreteNumberStore(
+          tNumberString); // await for that call. otherwise, should call verify (method after that, this should return null)
       // assert
       verify(mockInputConverter
           .stringToUnsignedInt(any)); // verifying if this method was called
@@ -96,22 +91,18 @@ void main() {
           Params(number: tNumberParsed))); // if was called
     });
 
-    test(
-        'should emit [state.loading, state.loaded] when data is gotten successfully',
+    test('should emit [state.loaded] when data is gotten successfully',
         () async {
       // arrange
       setUpMockInputConverterSuccess();
       when(mockGetConcreteNumberTrivia(any))
           .thenAnswer((_) async => Right(tNumberTrivia));
       // act
-      getTriviaAndWaitInputConvertCall();
-      final storeStates = [
-        getTriviaForConcreteNumberStore.state,
-        getTriviaForConcreteNumberStore.state,
-      ];
-      final expectedStates = [StoreState.loading, StoreState.loaded];
+      await getTriviaForConcreteNumberStore(tNumberString);
+      final storeState = getTriviaForConcreteNumberStore.state;
+      final expectedState = StoreState.loaded;
       // assert
-      expect(storeStates, equals(expectedStates));
+      expect(storeState, equals(expectedState));
       // verify(getTriviaForConcreteNumberStore(tNumberString));
     });
 
@@ -122,7 +113,7 @@ void main() {
       when(mockGetConcreteNumberTrivia(any))
           .thenAnswer((_) async => Left(ServerFailure()));
       // act
-      getTriviaAndWaitInputConvertCall();
+      await getTriviaForConcreteNumberStore(tNumberString);
       final storeStates = [
         getTriviaForConcreteNumberStore.state,
         Error(errorMessage: SERVER_FAILURE_MESSAGE)
@@ -142,9 +133,83 @@ void main() {
       when(mockGetConcreteNumberTrivia(any))
           .thenAnswer((_) async => Left(CacheFailure()));
       // act
-      getTriviaAndWaitInputConvertCall();
+      await getTriviaForConcreteNumberStore(tNumberString);
       final storeStates = [
         getTriviaForConcreteNumberStore.state,
+        Error(errorMessage: CACHE_FAILURE_MESSAGE)
+      ];
+      final expectedStates = [
+        StoreState.loading,
+        Error(errorMessage: CACHE_FAILURE_MESSAGE)
+      ];
+      // assert
+      expect(storeStates, equals(expectedStates));
+    });
+  });
+
+  group('GetTriviaForRandomNumber', () {
+    test('should return [state.initial]', () async {
+      // assert
+      expect(
+        getTriviaForRandomNumberStore.state,
+        equals(StoreState.initial),
+      );
+    });
+
+    final tNumberTrivia = NumberTrivia(number: 1, text: 'test trivia');
+    test('should get data from the random usecase', () async {
+      // arrange
+      when(mockGetRandomNumberTrivia(any))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+      // act
+      getTriviaForRandomNumberStore();
+      await untilCalled(mockGetRandomNumberTrivia(any));
+      // assert
+      verify(mockGetRandomNumberTrivia(NoParams())); // if was called
+    });
+
+    test('should emit [state.loaded] when data is gotten successfully',
+        () async {
+      // arrange
+      when(mockGetRandomNumberTrivia(any))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+      // act
+      await getTriviaForRandomNumberStore();
+      final storeState = getTriviaForRandomNumberStore.state;
+      final expectedState = StoreState.loaded;
+      // assert
+      expect(storeState, equals(expectedState));
+      // verify(getTriviaForRandomNumberStore(tNumberString));
+    });
+
+    test('should emit [state.loading, Error] when getting data fails',
+        () async {
+      // arrange
+      when(mockGetRandomNumberTrivia(any))
+          .thenAnswer((_) async => Left(ServerFailure()));
+      // act
+      await getTriviaForRandomNumberStore();
+      final storeStates = [
+        getTriviaForRandomNumberStore.state,
+        Error(errorMessage: SERVER_FAILURE_MESSAGE)
+      ];
+      final expectedStates = [
+        StoreState.loading,
+        Error(errorMessage: SERVER_FAILURE_MESSAGE)
+      ];
+      // assert
+      expect(storeStates, equals(expectedStates));
+    });
+
+    test('''should emit [state.loading, Error]
+        with proper message for the error when getting data fails''', () async {
+      // arrange
+      when(mockGetRandomNumberTrivia(any))
+          .thenAnswer((_) async => Left(CacheFailure()));
+      // act
+      await getTriviaForRandomNumberStore();
+      final storeStates = [
+        getTriviaForRandomNumberStore.state,
         Error(errorMessage: CACHE_FAILURE_MESSAGE)
       ];
       final expectedStates = [

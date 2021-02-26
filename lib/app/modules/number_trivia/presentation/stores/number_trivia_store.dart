@@ -44,7 +44,7 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
         getRandomNumberTrivia = random;
 
   @observable
-  ObservableFuture<Either<Failure, NumberTrivia>> numberTriviaFuture;
+  ObservableFuture numberTriviaFuture;
 
   @observable
   NumberTrivia numberTrivia;
@@ -76,6 +76,16 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
       default:
         return 'Unexpected error';
     }
+  }
+
+  void eitherLoadedOrErrorState(Either<Failure, NumberTrivia> result) {
+    return result.fold(
+      (failure) => Error(errorMessage: mapFailureToMessage(failure)),
+      (trivia) {
+        state = StoreState.loaded;
+        this.numberTrivia = trivia;
+      },
+    );
   }
 
   List<Object> get props => [];

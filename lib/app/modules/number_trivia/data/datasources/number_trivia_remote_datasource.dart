@@ -1,9 +1,10 @@
-import '../models/number_trivia_model.dart';
 import 'dart:convert';
 
-import 'package:flutter_tdd/app/core/error/exceptions.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+
+import '../../../../core/error/exceptions.dart';
+import '../models/number_trivia_model.dart';
 
 abstract class NumberTriviaRemoteDataSource {
   /// Calls the http://numbersapi.com/{number} endpoint.

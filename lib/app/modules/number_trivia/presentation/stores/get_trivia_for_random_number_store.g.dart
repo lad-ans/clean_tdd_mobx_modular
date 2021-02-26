@@ -7,7 +7,7 @@ part of 'get_trivia_for_random_number_store.dart';
 // **************************************************************************
 
 final $GetTriviaForRandomNumberStore = BindInject(
-  (i) => GetTriviaForRandomNumberStore(),
+  (i) => GetTriviaForRandomNumberStore(i<GetRandomNumberTrivia>()),
   singleton: true,
   lazy: true,
 );

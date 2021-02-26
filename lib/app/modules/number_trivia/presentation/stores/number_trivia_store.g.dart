@@ -26,14 +26,13 @@ mixin _$NumberTriviaStore on _NumberTriviaStoreBase, Store {
       Atom(name: '_NumberTriviaStoreBase.numberTriviaFuture');
 
   @override
-  ObservableFuture<Either<Failure, NumberTrivia>> get numberTriviaFuture {
+  ObservableFuture<dynamic> get numberTriviaFuture {
     _$numberTriviaFutureAtom.reportRead();
     return super.numberTriviaFuture;
   }
 
   @override
-  set numberTriviaFuture(
-      ObservableFuture<Either<Failure, NumberTrivia>> value) {
+  set numberTriviaFuture(ObservableFuture<dynamic> value) {
     _$numberTriviaFutureAtom.reportWrite(value, super.numberTriviaFuture, () {
       super.numberTriviaFuture = value;
     });
