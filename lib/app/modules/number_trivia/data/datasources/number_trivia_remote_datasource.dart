@@ -1,10 +1,15 @@
 import 'dart:convert';
 
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_modular/flutter_modular_annotations.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../models/number_trivia_model.dart';
+
+part 'number_trivia_remote_datasource.g.dart';
 
 abstract class NumberTriviaRemoteDataSource {
   /// Calls the http://numbersapi.com/{number} endpoint.
@@ -18,6 +23,7 @@ abstract class NumberTriviaRemoteDataSource {
   Future<NumberTriviaModel> getRandomNumberTrivia();
 }
 
+@Injectable()
 class NumberTriviaRemoteDataSourceImpl implements NumberTriviaRemoteDataSource {
   final http.Client client;
   NumberTriviaRemoteDataSourceImpl({

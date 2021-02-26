@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_modular/flutter_modular_annotations.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../core/error/exceptions.dart';
@@ -9,8 +11,11 @@ import '../../domain/repositories/number_trivia_repository.dart';
 import '../datasources/number_trivia_local_datasource.dart';
 import '../datasources/number_trivia_remote_datasource.dart';
 
+part 'number_trivia_repository_impl.g.dart';
+
 typedef Future<NumberTrivia> _ConcreteOrRandomChooser();
 
+@Injectable()
 class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
   final NumberTriviaRemoteDataSource remoteDataSource;
   final NumberTriviaLocalDataSource localDataSource;
