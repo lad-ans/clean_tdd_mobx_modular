@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter_tdd/app/core/error/failures.dart';
 import 'package:flutter_tdd/app/core/util/input_converter.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/domain/entities/number_trivia.dart';
 import 'package:flutter_tdd/app/modules/number_trivia/domain/usecases/get_concrete_number_trivia.dart';
@@ -37,10 +38,12 @@ void main() {
     );
   });
 
-  test('isEmpty observable should be true', () {
-    final tIsEmpty = true;
+  test('should return [state.initial]', () async {
     // assert
-    expect(store.isEmpty, equals(tIsEmpty));
+    expect(
+      getTriviaForConcreteNumberStore.state,
+      equals(StoreState.initial),
+    );
   });
 
   group('GetTriviaForConcreteNumber', () {
@@ -48,19 +51,26 @@ void main() {
     final tNumberParsed = 1;
     final tNumberTrivia =
         NumberTrivia(number: tNumberParsed, text: 'test trivia');
+
+    void setUpMockInputConverterSuccess() =>
+        when(mockInputConverter.stringToUnsignedInt(any))
+            .thenReturn(Right(tNumberParsed));
+
+    void getTriviaAndWaitInputConvertCall() async {
+      getTriviaForConcreteNumberStore(tNumberString);
+      await untilCalled(mockInputConverter.stringToUnsignedInt(tNumberString));
+    }
+
     test(
         'should call InputConverter to validate and convert the String to an unsigned Int',
         () async {
       // arrange
-      when(mockInputConverter.stringToUnsignedInt(any))
-          .thenReturn(Right(tNumberParsed));
+      setUpMockInputConverterSuccess();
       // act
-      getTriviaForConcreteNumberStore(tNumberString);
-      await untilCalled(mockInputConverter.stringToUnsignedInt(
-          any)); // await for that call. otherwise, should call verify (method after that, this should return null)
+      getTriviaAndWaitInputConvertCall(); // await for that call. otherwise, should call verify (method after that, this should return null)
       // assert
-      verify(mockInputConverter.stringToUnsignedInt(
-          tNumberString)); // verifying if this method was called
+      verify(mockInputConverter
+          .stringToUnsignedInt(any)); // verifying if this method was called
     });
 
     test('should emit [Error] when the input is invalid', () async {
@@ -69,10 +79,80 @@ void main() {
           .thenReturn(Left(InvalidInputFailure()));
       // act
       final result = getTriviaForConcreteNumberStore(tNumberString);
-
       // assert
       expect(
           result, equals(Error(errorMessage: INVALID_INPUT_FAILURE_MESSAGE)));
+    });
+
+    test('should get data from the concrete usecase', () async {
+      // arrange
+      setUpMockInputConverterSuccess();
+      when(mockGetConcreteNumberTrivia(any))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+      // act
+      getTriviaForConcreteNumberStore(tNumberString);
+      // assert
+      verify(mockGetConcreteNumberTrivia(
+          Params(number: tNumberParsed))); // if was called
+    });
+
+    test(
+        'should emit [state.loading, state.loaded] when data is gotten successfully',
+        () async {
+      // arrange
+      setUpMockInputConverterSuccess();
+      when(mockGetConcreteNumberTrivia(any))
+          .thenAnswer((_) async => Right(tNumberTrivia));
+      // act
+      getTriviaAndWaitInputConvertCall();
+      final storeStates = [
+        getTriviaForConcreteNumberStore.state,
+        getTriviaForConcreteNumberStore.state,
+      ];
+      final expectedStates = [StoreState.loading, StoreState.loaded];
+      // assert
+      expect(storeStates, equals(expectedStates));
+      // verify(getTriviaForConcreteNumberStore(tNumberString));
+    });
+
+    test('should emit [state.loading, Error] when getting data fails',
+        () async {
+      // arrange
+      setUpMockInputConverterSuccess();
+      when(mockGetConcreteNumberTrivia(any))
+          .thenAnswer((_) async => Left(ServerFailure()));
+      // act
+      getTriviaAndWaitInputConvertCall();
+      final storeStates = [
+        getTriviaForConcreteNumberStore.state,
+        Error(errorMessage: SERVER_FAILURE_MESSAGE)
+      ];
+      final expectedStates = [
+        StoreState.loading,
+        Error(errorMessage: SERVER_FAILURE_MESSAGE)
+      ];
+      // assert
+      expect(storeStates, equals(expectedStates));
+    });
+
+    test('''should emit [state.loading, Error]
+        with proper message for the error when getting data fails''', () async {
+      // arrange
+      setUpMockInputConverterSuccess();
+      when(mockGetConcreteNumberTrivia(any))
+          .thenAnswer((_) async => Left(CacheFailure()));
+      // act
+      getTriviaAndWaitInputConvertCall();
+      final storeStates = [
+        getTriviaForConcreteNumberStore.state,
+        Error(errorMessage: CACHE_FAILURE_MESSAGE)
+      ];
+      final expectedStates = [
+        StoreState.loading,
+        Error(errorMessage: CACHE_FAILURE_MESSAGE)
+      ];
+      // assert
+      expect(storeStates, equals(expectedStates));
     });
   });
 }

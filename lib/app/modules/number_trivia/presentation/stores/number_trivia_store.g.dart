@@ -22,48 +22,35 @@ final $NumberTriviaStore = BindInject(
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$NumberTriviaStore on _NumberTriviaStoreBase, Store {
-  final _$isEmptyAtom = Atom(name: '_NumberTriviaStoreBase.isEmpty');
+  final _$numberTriviaFutureAtom =
+      Atom(name: '_NumberTriviaStoreBase.numberTriviaFuture');
 
   @override
-  bool get isEmpty {
-    _$isEmptyAtom.reportRead();
-    return super.isEmpty;
+  ObservableFuture<Either<Failure, NumberTrivia>> get numberTriviaFuture {
+    _$numberTriviaFutureAtom.reportRead();
+    return super.numberTriviaFuture;
   }
 
   @override
-  set isEmpty(bool value) {
-    _$isEmptyAtom.reportWrite(value, super.isEmpty, () {
-      super.isEmpty = value;
+  set numberTriviaFuture(
+      ObservableFuture<Either<Failure, NumberTrivia>> value) {
+    _$numberTriviaFutureAtom.reportWrite(value, super.numberTriviaFuture, () {
+      super.numberTriviaFuture = value;
     });
   }
 
-  final _$isLoadingAtom = Atom(name: '_NumberTriviaStoreBase.isLoading');
+  final _$numberTriviaAtom = Atom(name: '_NumberTriviaStoreBase.numberTrivia');
 
   @override
-  bool get isLoading {
-    _$isLoadingAtom.reportRead();
-    return super.isLoading;
+  NumberTrivia get numberTrivia {
+    _$numberTriviaAtom.reportRead();
+    return super.numberTrivia;
   }
 
   @override
-  set isLoading(bool value) {
-    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
-      super.isLoading = value;
-    });
-  }
-
-  final _$isLoadedAtom = Atom(name: '_NumberTriviaStoreBase.isLoaded');
-
-  @override
-  bool get isLoaded {
-    _$isLoadedAtom.reportRead();
-    return super.isLoaded;
-  }
-
-  @override
-  set isLoaded(bool value) {
-    _$isLoadedAtom.reportWrite(value, super.isLoaded, () {
-      super.isLoaded = value;
+  set numberTrivia(NumberTrivia value) {
+    _$numberTriviaAtom.reportWrite(value, super.numberTrivia, () {
+      super.numberTrivia = value;
     });
   }
 
@@ -82,13 +69,28 @@ mixin _$NumberTriviaStore on _NumberTriviaStoreBase, Store {
     });
   }
 
+  final _$stateAtom = Atom(name: '_NumberTriviaStoreBase.state');
+
+  @override
+  StoreState get state {
+    _$stateAtom.reportRead();
+    return super.state;
+  }
+
+  @override
+  set state(StoreState value) {
+    _$stateAtom.reportWrite(value, super.state, () {
+      super.state = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
-isEmpty: ${isEmpty},
-isLoading: ${isLoading},
-isLoaded: ${isLoaded},
-errorMessage: ${errorMessage}
+numberTriviaFuture: ${numberTriviaFuture},
+numberTrivia: ${numberTrivia},
+errorMessage: ${errorMessage},
+state: ${state}
     ''';
   }
 }

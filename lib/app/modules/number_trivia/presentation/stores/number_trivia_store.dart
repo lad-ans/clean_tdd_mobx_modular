@@ -1,9 +1,12 @@
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:meta/meta.dart';
 import 'package:mobx/mobx.dart';
 
+import '../../../../core/error/failures.dart';
 import '../../../../core/util/input_converter.dart';
+import '../../domain/entities/number_trivia.dart';
 import '../../domain/usecases/get_concrete_number_trivia.dart';
 import '../../domain/usecases/get_random_number_trivia.dart';
 
@@ -13,6 +16,9 @@ const String SERVER_FAILURE_MESSAGE = 'Server Failure';
 const String CACHE_FAILURE_MESSAGE = 'Cache Failure';
 const String INVALID_INPUT_FAILURE_MESSAGE =
     'Invalid Input - The number must be a positive integer or zero';
+
+// states
+enum StoreState { initial, loading, loaded }
 
 @Injectable()
 // ignore: must_be_immutable
@@ -30,29 +36,47 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
     @required this.inputConverter,
   })  :
         /**
-         * ---------------------------------------
-          THAT ASSERTION AVOID PASTE A NULL DEPENDENCY.
-          BUT IN OUR CASEIS NOT NECESSARY BECAUSE SOME DEPENDENCY...
-          ARE NOT NECESSARY IN ONE OR OTHER STORE
-          ----------------------------------------
           assert(concrete != null),
           assert(random != null),
           assert(inputConverter != null),
-         * */
+        */
         getConcreteNumberTrivia = concrete,
         getRandomNumberTrivia = random;
 
   @observable
-  bool isEmpty = true;
+  ObservableFuture<Either<Failure, NumberTrivia>> numberTriviaFuture;
 
   @observable
-  bool isLoading = false;
+  NumberTrivia numberTrivia;
 
   @observable
-  bool isLoaded = false;
+  String errorMessage;
+
+  // @computed
+  // StoreState get state {
+  //   if (numberTriviaFuture == null ||
+  //       numberTriviaFuture.status == FutureStatus.rejected) {
+  //     return StoreState.initial;
+  //   }
+  //   return numberTriviaFuture.status == FutureStatus.pending
+  //       ? StoreState.loading
+  //       : StoreState.loaded;
+  // }
 
   @observable
-  String errorMessage = '';
+  StoreState state;
+
+  String mapFailureToMessage(Failure failure) {
+    switch (failure.runtimeType) {
+      case ServerFailure:
+        return SERVER_FAILURE_MESSAGE;
+      case CacheFailure:
+        return CACHE_FAILURE_MESSAGE;
+        break;
+      default:
+        return 'Unexpected error';
+    }
+  }
 
   List<Object> get props => [];
 }
