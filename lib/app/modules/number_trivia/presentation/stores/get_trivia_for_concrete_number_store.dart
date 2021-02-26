@@ -1,13 +1,10 @@
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mobx/mobx.dart';
 
-import '../../../../core/util/input_converter.dart';
 import '../../domain/usecases/get_concrete_number_trivia.dart';
 import 'number_trivia_store.dart';
 
 part 'get_trivia_for_concrete_number_store.g.dart';
 
-@Injectable()
 // ignore: must_be_immutable
 class GetTriviaForConcreteNumberStore = _GetTriviaForConcreteNumberStoreBase
     with _$GetTriviaForConcreteNumberStore;

@@ -1,14 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:flutter_modular/flutter_modular_annotations.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../models/number_trivia_model.dart';
-
-part 'number_trivia_local_datasource.g.dart';
 
 abstract class NumberTriviaLocalDataSource {
   /// Gets the cached [NumberTriviaModel] wich was gotten the last time.
@@ -25,7 +21,6 @@ abstract class NumberTriviaLocalDataSource {
 
 const CACHED_NUMBER_TRIVIA = 'CACHED_NUMBER_TRIVIA';
 
-@Injectable()
 class NumberTriviaLocalDataSourceImpl implements NumberTriviaLocalDataSource {
   final SharedPreferences sharedPreferences;
   NumberTriviaLocalDataSourceImpl({

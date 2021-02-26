@@ -3,17 +3,6 @@
 part of 'get_trivia_for_concrete_number_store.dart';
 
 // **************************************************************************
-// InjectionGenerator
-// **************************************************************************
-
-final $GetTriviaForConcreteNumberStore = BindInject(
-  (i) => GetTriviaForConcreteNumberStore(
-      i<GetConcreteNumberTrivia>(), i<InputConverter>()),
-  singleton: true,
-  lazy: true,
-);
-
-// **************************************************************************
 // StoreGenerator
 // **************************************************************************
 

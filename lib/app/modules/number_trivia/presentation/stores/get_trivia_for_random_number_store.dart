@@ -1,14 +1,10 @@
-import 'package:flutter_modular/flutter_modular.dart';
-import 'package:flutter_modular/flutter_modular_annotations.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../../domain/usecases/get_random_number_trivia.dart';
 import 'package:mobx/mobx.dart';
 
+import '../../../../core/usecases/usecase.dart';
 import 'number_trivia_store.dart';
 
 part 'get_trivia_for_random_number_store.g.dart';
 
-@Injectable()
 // ignore: must_be_immutable
 class GetTriviaForRandomNumberStore = _GetTriviaForRandomNumberStoreBase
     with _$GetTriviaForRandomNumberStore;

@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:meta/meta.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../../../core/util/injection.dart';
 import '../../../../core/util/input_converter.dart';
 import '../../domain/entities/number_trivia.dart';
 import '../../domain/usecases/get_concrete_number_trivia.dart';
@@ -20,7 +20,9 @@ const String INVALID_INPUT_FAILURE_MESSAGE =
 // states
 enum StoreState { initial, loading, loaded }
 
-@Injectable()
+// switcher
+enum Trivia { concrete, random }
+
 // ignore: must_be_immutable
 class NumberTriviaStore = _NumberTriviaStoreBase with _$NumberTriviaStore;
 
@@ -41,7 +43,9 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
           assert(inputConverter != null),
         */
         getConcreteNumberTrivia = concrete,
-        getRandomNumberTrivia = random;
+        getRandomNumberTrivia = random {
+    state = StoreState.initial;
+  }
 
   @observable
   ObservableFuture numberTriviaFuture;
@@ -51,6 +55,45 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
 
   @observable
   String errorMessage;
+
+  @observable
+  StoreState state;
+
+  @observable
+  Trivia switcher;
+
+  @action
+  void triviaAndStateSetter(Trivia triviaSwitcher) {
+    this.switcher = triviaSwitcher;
+  }
+
+  @computed
+  NumberTrivia get triviaSwitcher {
+    switch (switcher) {
+      case Trivia.concrete:
+        return Injection.getConcreteNumberTriviaStore.numberTrivia;
+        break;
+      case Trivia.random:
+        return Injection.getRandomNumberTriviaStore.numberTrivia;
+        break;
+      default:
+        return NumberTrivia(number: 1, text: 'Error getting trivia');
+    }
+  }
+
+  @computed
+  StoreState get stateSwitcher {
+    switch (switcher) {
+      case Trivia.concrete:
+        return Injection.getConcreteNumberTriviaStore.state;
+        break;
+      case Trivia.random:
+        return Injection.getRandomNumberTriviaStore.state;
+        break;
+      default:
+        return StoreState.initial;
+    }
+  }
 
   // @computed
   // StoreState get state {
@@ -62,9 +105,6 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
   //       ? StoreState.loading
   //       : StoreState.loaded;
   // }
-
-  @observable
-  StoreState state;
 
   String mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
@@ -78,9 +118,13 @@ abstract class _NumberTriviaStoreBase extends Equatable with Store {
     }
   }
 
-  void eitherLoadedOrErrorState(Either<Failure, NumberTrivia> result) {
+  void eitherLoadedOrErrorState(
+    Either<Failure, NumberTrivia> result,
+  ) {
     return result.fold(
-      (failure) => Error(errorMessage: mapFailureToMessage(failure)),
+      (failure) => Error(
+        errorMessage: mapFailureToMessage(failure),
+      ),
       (trivia) {
         state = StoreState.loaded;
         this.numberTrivia = trivia;

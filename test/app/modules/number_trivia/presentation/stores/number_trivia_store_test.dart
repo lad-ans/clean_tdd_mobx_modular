@@ -19,6 +19,7 @@ class MockGetRandomNumberTrivia extends Mock implements GetRandomNumberTrivia {}
 class MockInputConverter extends Mock implements InputConverter {}
 
 void main() {
+  NumberTriviaStore triviaStore;
   GetTriviaForConcreteNumberStore getTriviaForConcreteNumberStore;
   GetTriviaForRandomNumberStore getTriviaForRandomNumberStore;
   MockGetConcreteNumberTrivia mockGetConcreteNumberTrivia;
@@ -29,12 +30,25 @@ void main() {
     mockInputConverter = MockInputConverter();
     mockGetRandomNumberTrivia = MockGetRandomNumberTrivia();
     mockGetConcreteNumberTrivia = MockGetConcreteNumberTrivia();
+    triviaStore = NumberTriviaStore(
+      concrete: mockGetConcreteNumberTrivia,
+      random: mockGetRandomNumberTrivia,
+      inputConverter: mockInputConverter,
+    );
     getTriviaForConcreteNumberStore = GetTriviaForConcreteNumberStore(
       mockGetConcreteNumberTrivia,
       mockInputConverter,
     );
     getTriviaForRandomNumberStore =
         GetTriviaForRandomNumberStore(mockGetRandomNumberTrivia);
+  });
+
+  test('should return [state.initial]', () async {
+    // assert
+    expect(
+      triviaStore.state,
+      equals(StoreState.initial),
+    );
   });
 
   group('GetTriviaForConcreteNumber', () {

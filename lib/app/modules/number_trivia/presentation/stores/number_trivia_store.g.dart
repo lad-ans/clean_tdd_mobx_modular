@@ -3,25 +3,27 @@
 part of 'number_trivia_store.dart';
 
 // **************************************************************************
-// InjectionGenerator
-// **************************************************************************
-
-final $NumberTriviaStore = BindInject(
-  (i) => NumberTriviaStore(
-      concrete: i<GetConcreteNumberTrivia>(),
-      random: i<GetRandomNumberTrivia>(),
-      inputConverter: i<InputConverter>()),
-  singleton: true,
-  lazy: true,
-);
-
-// **************************************************************************
 // StoreGenerator
 // **************************************************************************
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$NumberTriviaStore on _NumberTriviaStoreBase, Store {
+  Computed<NumberTrivia> _$triviaSwitcherComputed;
+
+  @override
+  NumberTrivia get triviaSwitcher => (_$triviaSwitcherComputed ??=
+          Computed<NumberTrivia>(() => super.triviaSwitcher,
+              name: '_NumberTriviaStoreBase.triviaSwitcher'))
+      .value;
+  Computed<StoreState> _$stateSwitcherComputed;
+
+  @override
+  StoreState get stateSwitcher => (_$stateSwitcherComputed ??=
+          Computed<StoreState>(() => super.stateSwitcher,
+              name: '_NumberTriviaStoreBase.stateSwitcher'))
+      .value;
+
   final _$numberTriviaFutureAtom =
       Atom(name: '_NumberTriviaStoreBase.numberTriviaFuture');
 
@@ -83,13 +85,45 @@ mixin _$NumberTriviaStore on _NumberTriviaStoreBase, Store {
     });
   }
 
+  final _$switcherAtom = Atom(name: '_NumberTriviaStoreBase.switcher');
+
+  @override
+  Trivia get switcher {
+    _$switcherAtom.reportRead();
+    return super.switcher;
+  }
+
+  @override
+  set switcher(Trivia value) {
+    _$switcherAtom.reportWrite(value, super.switcher, () {
+      super.switcher = value;
+    });
+  }
+
+  final _$_NumberTriviaStoreBaseActionController =
+      ActionController(name: '_NumberTriviaStoreBase');
+
+  @override
+  void triviaAndStateSetter(Trivia triviaSwitcher) {
+    final _$actionInfo = _$_NumberTriviaStoreBaseActionController.startAction(
+        name: '_NumberTriviaStoreBase.triviaAndStateSetter');
+    try {
+      return super.triviaAndStateSetter(triviaSwitcher);
+    } finally {
+      _$_NumberTriviaStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
 numberTriviaFuture: ${numberTriviaFuture},
 numberTrivia: ${numberTrivia},
 errorMessage: ${errorMessage},
-state: ${state}
+state: ${state},
+switcher: ${switcher},
+triviaSwitcher: ${triviaSwitcher},
+stateSwitcher: ${stateSwitcher}
     ''';
   }
 }
